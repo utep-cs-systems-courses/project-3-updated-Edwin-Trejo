@@ -7,7 +7,7 @@
 #define S3 BIT2
 #define S4 BIT3
 
-#define P2SWITCHES (S1 | S2 | S3 | S4)
+#define P2_SWITCHES (S1 | S2 | S3 | S4)
 #define SWITCHES SW1
 
 void switch_init();

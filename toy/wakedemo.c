@@ -2,6 +2,7 @@
 #include <libTimer.h>
 #include "lcdutils.h"
 #include "lcddraw.h"
+#include "abCircle.h"
 
 #define LED_GREEN BIT6             // P1.6
 
