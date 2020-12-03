@@ -136,13 +136,38 @@ void mlAdvance(MovLayer *ml, Region *fence)
   } /**< for ml */
 }
 
+int checkPlayer(MovLayer *ml, Region *player)
+{
+  Vec2 newPos;
+  u_char axis;
+  Region shapeBoundary;
+  int points = 0;
+
+  for (; ml; ml = ml->next) {
+    vec2Add(&newPos, &ml->layer->posNext, &ml->velocity);
+    abShapeGetBounds(ml->layer->abShape, &newPos, &shapeBoundary);
+    for (axis = 0; axis < 2; axis ++) {
+      if ((shapeBoundary.topLeft.axes[axis] < player->topLeft.axes[axis]) ||
+	  (shapeBoundary.botRight.axes[axis] > player->botRight.axes[axis]) ) {
+	int velocity = ml->velocity.axes[axis] = -ml->velocity.axes[axis];
+	newPos.axes[axis] += (2*velocity);
+	points += 1;
+      }/**< if outside of fence */ 
+    } /**< for axis */
+    ml->layer->posNext = newPos;
+  } /**< for ml */
+  return points;
+}
+
 void wdt_c_handler()
 {
   static int secCount = 0;
+  static int playerCount = 0;
   static short count = 0;
 
   count ++;
   secCount ++;
+  playerCount ++;
   
   if (secCount == 250) {		/* once/sec */
     secCount = 0;
@@ -155,6 +180,12 @@ void wdt_c_handler()
     if (p2sw_read())
       redrawScreen = 1;
     count =0;
+  }
+  if (playerCount == 20){
+    checkPlayer(&ml0, &player);
+    /*    if (p2sw_read())
+      redrawScreen = 1;
+    playerCount = 0;*/
   }
 }
 
