@@ -14,6 +14,7 @@ short redrawScreen = 1;
 u_int fontFgColor = COLOR_GREEN;
 u_int bgColor = COLOR_WHITE;
 Region fieldFence;
+Region player;
 
 AbRect rect10 = {abRectGetBounds, abRectCheck, {10,10}}; /*10x10 rectangle  */
 AbRectOutline fieldOutline ={                 // playing field
@@ -129,7 +130,7 @@ void mlAdvance(MovLayer *ml, Region *fence)
 	  (shapeBoundary.botRight.axes[axis] > fence->botRight.axes[axis]) ) {
 	int velocity = ml->velocity.axes[axis] = -ml->velocity.axes[axis];
 	newPos.axes[axis] += (2*velocity);
-      }/**< if outside of fence */
+      }/**< if outside of fence */ 
     } /**< for axis */
     ml->layer->posNext = newPos;
   } /**< for ml */
@@ -173,6 +174,7 @@ void main()
   layerDraw(&layer0);
 
   layerGetBounds(&fieldLayer, &fieldFence);
+  layerGetBounds(&layer0, &player);
 
   
   enableWDTInterrupts();      /**< enable periodic interrupt */
@@ -184,6 +186,7 @@ void main()
     if (redrawScreen) {
       redrawScreen = 0;
       drawString5x7(20,15, "Catch every ball!", fontFgColor, COLOR_WHITE);
+      drawString5x7(15,25, "points: ", COLOR_BLACK, COLOR_WHITE);
       movLayerDraw(&ml0, &layer0);
     }
     P1OUT &= ~LED_GREEN;	/* green off */
