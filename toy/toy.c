@@ -74,6 +74,7 @@ typedef struct MovLayer_s {
 /* initial value of {0,0} will be overwritten */
 MovLayer ml3 = { &layer4, {1,1}, 0 }; /**< not all layers move */
 MovLayer ml1 = { &layer1, {1,2}, &ml3 };
+//MovLayer ml2 = { &layer0, {2,2}, &ml2 };
 MovLayer ml0 = { &layer3, {2,1}, &ml1 };
 
 
@@ -181,11 +182,11 @@ void wdt_c_handler()
       redrawScreen = 1;
     count =0;
   }
-  if (playerCount == 20){
-    checkPlayer(&ml0, &player);
-    /*    if (p2sw_read())
+  if (playerCount == 15){
+    checkPlayer(&ml3, &player);
+    if (p2sw_read())
       redrawScreen = 1;
-    playerCount = 0;*/
+    playerCount = 0;
   }
 }
 
@@ -219,6 +220,7 @@ void main()
       drawString5x7(20,15, "Catch every ball!", fontFgColor, COLOR_WHITE);
       drawString5x7(15,25, "points: ", COLOR_BLACK, COLOR_WHITE);
       movLayerDraw(&ml0, &layer0);
+      movLayerDraw(&ml3, &layer1);
     }
     P1OUT &= ~LED_GREEN;	/* green off */
     or_sr(0x10);		/**< CPU OFF */
