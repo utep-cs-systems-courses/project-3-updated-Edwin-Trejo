@@ -9,6 +9,7 @@
 
 
 #define LED_GREEN BIT6             // P1.6
+#define LED_RED BIT0
 
 short redrawScreen = 1;
 u_int fontFgColor = COLOR_GREEN;
@@ -17,12 +18,13 @@ Region fieldFence;
 
 
 AbRect rect10 = {abRectGetBounds, abRectCheck, {10,10}}; /*10x10 rectangle  */
-AbRect rect15 = {abRectGetBounds, abRectCheck, {15,15}};
+
 
 AbRectOutline fieldOutline ={                 // playing field
   abRectOutlineGetBounds, abRectOutlineCheck,
   {screenWidth/2 - 10, screenHeight/2 - 10}
 };
+
 
 Layer layer4= {
   (AbShape *)&circle8,
@@ -57,12 +59,13 @@ Layer layer1= {
  };
 
 Layer layer0= {
-  (AbShape *)&rect10,
+  (AbShape *)&circle14,
   {(screenWidth/2), screenHeight-30},
   {0,0},{0,0},
   COLOR_BLUE,
   &layer1,
  };
+
 
 
 typedef struct MovLayer_s {
@@ -75,8 +78,8 @@ typedef struct MovLayer_s {
 
 /* initial value of {0,0} will be overwritten */
 MovLayer ml3 = { &layer4, {1,1}, 0 }; /**< not all layers move */
-MovLayer ml1 = { &layer1, {1,2}, &ml3 };
-MovLayer ml0 = { &layer3, {2,1}, &ml1 };
+MovLayer ml1 = { &layer3, {1,2}, &ml3 };
+MovLayer ml0 = { &layer1, {2,1}, &ml1 };
 
 
 void movLayerDraw(MovLayer *movLayers, Layer *layers)
@@ -146,7 +149,7 @@ void wdt_c_handler()
 
   count ++;
   secCount ++;
-  playerCount ++;
+  u_int switches = p2sw_read();
   
   if (secCount == 250) {		/* once/sec */
     secCount = 0;
@@ -160,6 +163,7 @@ void wdt_c_handler()
       redrawScreen = 1;
     count =0;
   }
+  
 }
 
 
