@@ -14,9 +14,11 @@ short redrawScreen = 1;
 u_int fontFgColor = COLOR_GREEN;
 u_int bgColor = COLOR_WHITE;
 Region fieldFence;
-Region player;
+
 
 AbRect rect10 = {abRectGetBounds, abRectCheck, {10,10}}; /*10x10 rectangle  */
+AbRect rect15 = {abRectGetBounds, abRectCheck, {15,15}};
+
 AbRectOutline fieldOutline ={                 // playing field
   abRectOutlineGetBounds, abRectOutlineCheck,
   {screenWidth/2 - 10, screenHeight/2 - 10}
@@ -74,7 +76,6 @@ typedef struct MovLayer_s {
 /* initial value of {0,0} will be overwritten */
 MovLayer ml3 = { &layer4, {1,1}, 0 }; /**< not all layers move */
 MovLayer ml1 = { &layer1, {1,2}, &ml3 };
-//MovLayer ml2 = { &layer0, {2,2}, &ml2 };
 MovLayer ml0 = { &layer3, {2,1}, &ml1 };
 
 
@@ -137,29 +138,6 @@ void mlAdvance(MovLayer *ml, Region *fence)
   } /**< for ml */
 }
 
-int checkPlayer(MovLayer *ml, Region *player)
-{
-  Vec2 newPos;
-  u_char axis;
-  Region shapeBoundary;
-  int points = 0;
-
-  for (; ml; ml = ml->next) {
-    vec2Add(&newPos, &ml->layer->posNext, &ml->velocity);
-    abShapeGetBounds(ml->layer->abShape, &newPos, &shapeBoundary);
-    for (axis = 0; axis < 2; axis ++) {
-      if ((shapeBoundary.topLeft.axes[axis] < player->topLeft.axes[axis]) ||
-	  (shapeBoundary.botRight.axes[axis] > player->botRight.axes[axis]) ) {
-	int velocity = ml->velocity.axes[axis] = -ml->velocity.axes[axis];
-	newPos.axes[axis] += (2*velocity);
-	points += 1;
-      }/**< if outside of fence */ 
-    } /**< for axis */
-    ml->layer->posNext = newPos;
-  } /**< for ml */
-  return points;
-}
-
 void wdt_c_handler()
 {
   static int secCount = 0;
@@ -182,12 +160,6 @@ void wdt_c_handler()
       redrawScreen = 1;
     count =0;
   }
-  if (playerCount == 15){
-    checkPlayer(&ml3, &player);
-    if (p2sw_read())
-      redrawScreen = 1;
-    playerCount = 0;
-  }
 }
 
 
@@ -206,7 +178,6 @@ void main()
   layerDraw(&layer0);
 
   layerGetBounds(&fieldLayer, &fieldFence);
-  layerGetBounds(&layer0, &player);
 
   
   enableWDTInterrupts();      /**< enable periodic interrupt */
@@ -217,10 +188,9 @@ void main()
   while (1) {			/* forever */
     if (redrawScreen) {
       redrawScreen = 0;
-      drawString5x7(20,15, "Catch every ball!", fontFgColor, COLOR_WHITE);
-      drawString5x7(15,25, "points: ", COLOR_BLACK, COLOR_WHITE);
+      drawString5x7(20,15, "Press any button!", fontFgColor, COLOR_WHITE);
       movLayerDraw(&ml0, &layer0);
-      movLayerDraw(&ml3, &layer1);
+     
     }
     P1OUT &= ~LED_GREEN;	/* green off */
     or_sr(0x10);		/**< CPU OFF */
